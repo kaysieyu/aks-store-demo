@@ -349,7 +349,7 @@ kind: Deployment
 metadata:
   name: store-front
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: store-front
@@ -373,11 +373,8 @@ spec:
           value: "http://product-service:3002/"
         resources:
           requests:
-            cpu: 1m
-            memory: 200Mi
-          limits:
-            cpu: 1000m
-            memory: 512Mi
+            cpu: 11m
+            memory: 50Mi
         startupProbe:
           httpGet:
             path: /health
@@ -479,35 +476,3 @@ spec:
   selector:
     app: store-admin
   type: LoadBalancer  
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: virtual-customer
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: virtual-customer
-  template:
-    metadata:
-      labels:
-        app: virtual-customer
-    spec:
-      nodeSelector:
-        "kubernetes.io/os": linux
-      containers:
-      - name: virtual-customer
-        image: ghcr.io/azure-samples/aks-store-demo/virtual-customer:latest
-        env:
-        - name: ORDER_SERVICE_URL
-          value: http://order-service:3000/
-        - name: ORDERS_PER_HOUR
-          value: "100"
-        resources:
-          requests:
-            cpu: 1m
-            memory: 1Mi
-          limits:
-            cpu: 2m
-            memory: 20Mi
