@@ -1,0 +1,23 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: store-front
+  labels:
+    app: store-front
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: store-front
+  resourcePolicy:
+    containerPolicies:
+      - containerName: '*'
+        minAllowed:
+          cpu: 1m
+          memory: 10Mi
+        maxAllowed:
+          cpu: 500m
+          memory: 1000Mi
+        controlledResources: ["cpu", "memory"]
+  updatePolicy:
+    updateMode: "Auto"
