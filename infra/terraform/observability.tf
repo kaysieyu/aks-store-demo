@@ -45,7 +45,7 @@ resource "azurerm_role_assignment" "example_rg_amg" {
 
 resource "azurerm_monitor_data_collection_endpoint" "example_msprom" {
   count               = local.deploy_observability_tools ? 1 : 0
-  name                = "MSProm-${azurerm_resource_group.example.location}-${azurerm_kubernetes_cluster.example.name}"
+  name                = "MSProm-${azurerm_resource_group.example.location}-${azapi_resource.aks.name}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   kind                = "Linux"
@@ -54,7 +54,7 @@ resource "azurerm_monitor_data_collection_endpoint" "example_msprom" {
 
 resource "azurerm_monitor_data_collection_rule" "example_msprom" {
   count                       = local.deploy_observability_tools ? 1 : 0
-  name                        = "MSProm-${azurerm_kubernetes_cluster.example.location}-${azurerm_kubernetes_cluster.example.name}"
+  name                        = "MSProm-${azapi_resource.aks.location}-${azapi_resource.aks.name}"
   resource_group_name         = azurerm_resource_group.example.name
   location                    = azurerm_resource_group.example.location
   data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.example_msprom[0].id
@@ -81,23 +81,23 @@ resource "azurerm_monitor_data_collection_rule" "example_msprom" {
 
 resource "azurerm_monitor_data_collection_rule_association" "example_dcr_to_aks" {
   count                   = local.deploy_observability_tools ? 1 : 0
-  name                    = "dcr-${azurerm_kubernetes_cluster.example.name}"
-  target_resource_id      = azurerm_kubernetes_cluster.example.id
+  name                    = "dcr-${azapi_resource.aks.name}"
+  target_resource_id      = azapi_resource.aks.id
   data_collection_rule_id = azurerm_monitor_data_collection_rule.example_msprom[0].id
 }
 
 resource "azurerm_monitor_data_collection_rule_association" "example_dce_to_aks" {
   count                       = local.deploy_observability_tools ? 1 : 0
-  target_resource_id          = azurerm_kubernetes_cluster.example.id
+  target_resource_id          = azapi_resource.aks.id
   data_collection_endpoint_id = azurerm_monitor_data_collection_endpoint.example_msprom[0].id
 }
 
 resource "azurerm_monitor_alert_prometheus_rule_group" "example_node" {
   count               = local.deploy_observability_tools ? 1 : 0
-  name                = "NodeRecordingRulesRuleGroup-${azurerm_kubernetes_cluster.example.name}"
+  name                = "NodeRecordingRulesRuleGroup-${azapi_resource.aks.name}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  cluster_name        = azurerm_kubernetes_cluster.example.name
+  cluster_name        = azapi_resource.aks.name
   rule_group_enabled  = true
   interval            = "PT1M"
   scopes              = [azurerm_monitor_workspace.example[0].id]
@@ -160,10 +160,10 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "example_node" {
 
 resource "azurerm_monitor_alert_prometheus_rule_group" "example_k8s" {
   count               = local.deploy_observability_tools ? 1 : 0
-  name                = "KubernetesRecordingRulesRuleGroup-${azurerm_kubernetes_cluster.example.name}"
+  name                = "KubernetesRecordingRulesRuleGroup-${azapi_resource.aks.name}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  cluster_name        = azurerm_kubernetes_cluster.example.name
+  cluster_name        = azapi_resource.aks.name
   rule_group_enabled  = true
   interval            = "PT1M"
   scopes              = [azurerm_monitor_workspace.example[0].id]
@@ -279,7 +279,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "example_k8s" {
 
 resource "azurerm_monitor_data_collection_rule" "example_msci" {
   count               = local.deploy_observability_tools ? 1 : 0
-  name                = "MSCI-${azurerm_resource_group.example.location}-${azurerm_kubernetes_cluster.example.name}"
+  name                = "MSCI-${azurerm_resource_group.example.location}-${azapi_resource.aks.name}"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   kind                = "Linux"
@@ -316,7 +316,7 @@ resource "azurerm_monitor_data_collection_rule" "example_msci" {
 
 resource "azurerm_monitor_data_collection_rule_association" "example_msci_to_aks" {
   count                   = local.deploy_observability_tools ? 1 : 0
-  name                    = "msci-${azurerm_kubernetes_cluster.example.name}"
-  target_resource_id      = azurerm_kubernetes_cluster.example.id
+  name                    = "msci-${azapi_resource.aks.name}"
+  target_resource_id      = azapi_resource.aks.id
   data_collection_rule_id = azurerm_monitor_data_collection_rule.example_msci[0].id
 }
